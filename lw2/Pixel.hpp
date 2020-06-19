@@ -1,5 +1,8 @@
 #include <ostream>
 
+namespace
+{
+
 struct Pixel
 {
 	friend std::ostream & operator<<(std::ostream & strm, const Pixel & pixel);
@@ -8,6 +11,8 @@ struct Pixel
 	uint8_t G;
 	uint8_t B;
 };
+
+}
 
 using BitmapPixel = Pixel; // TODO:
 

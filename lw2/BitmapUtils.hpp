@@ -1,5 +1,7 @@
-#pragma warning(push, 1)
-#include <boost/gil.hpp>
+#pragma warning(disable : 4714)
+#pragma warning(disable : 4244)
+
+#pragma warning(push, 0)
 #include <boost/gil/extension/io/bmp.hpp>
 #pragma warning(pop)
 
@@ -23,9 +25,9 @@ ImageInfo ImportPixels(std::string_view imgInName)
 	pixels.reserve(img.width() * img.height() * num_channels<rgb8_image_t>());
 	for_each_pixel(const_view(img), [&pixels](boost::gil::rgb8_pixel_t p) {
 		pixels.push_back({
-			boost::gil::at_c<0>(p),
-			boost::gil::at_c<1>(p),
-			boost::gil::at_c<2>(p)
+			at_c<0>(p),
+			at_c<1>(p),
+			at_c<2>(p)
 		});
 	});
 	return {

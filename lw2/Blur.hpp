@@ -1,3 +1,4 @@
+#include <functional>
 #include <algorithm>
 #include <iostream>
 #include <optional>
@@ -8,7 +9,8 @@
 #include <thread>
 #include <array>
 
-#include "BoostUtils.hpp"
+#include "BitmapUtils.hpp"
+#include "ThreadUtils.h"
 
 namespace
 {
@@ -83,7 +85,7 @@ std::vector<Bitmap> BunchifyBitmap(const Bitmap & bmp, size_t bunchSize)
 
 }
 
-void Blur(std::string_view imgInName, std::string_view imgOutName, size_t threadsCount)
+void Blur(std::string_view imgInName, std::string_view imgOutName, size_t threadsCount, size_t coresCount)
 {
 	auto [pixels, width, height] = ImportPixels(imgInName);
 	Bitmap bmp(pixels, width, height);
@@ -95,8 +97,9 @@ void Blur(std::string_view imgInName, std::string_view imgOutName, size_t thread
 		threads.emplace_back([&subBitmaps, i]() {
 			subBitmaps[i] = BlurBitmap(subBitmaps[i]);
 		});
+		SetThreadAffinityMask(threads.back(), coresCount);
 	}
-	for_each(threads.begin(), threads.end(), mem_fn(&std::thread::join));
+	for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
 
 	std::vector<Pixel> totalBluredPixels;
 	totalBluredPixels.reserve(bmp.Width() * bmp.Height());
