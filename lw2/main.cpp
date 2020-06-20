@@ -1,8 +1,43 @@
-#include <iostream>
+#include <CommandLineUtils.hpp>
+#include <TimeUtils.hpp>
+#include <BlurUtils.hpp>
 
-#include "CommandLineUtils.hpp"
-#include "TimeUtils.hpp"
-#include "Blur.hpp"
+namespace
+{
+
+Bitmap MergeBitmaps(std::vector<Bitmap> && bitmaps, size_t width, size_t height)
+{
+	std::vector<Pixel> totalBluredPixels;
+	totalBluredPixels.reserve(width * height);
+	for (const auto & bluredBitmap : bitmaps)
+	{
+		const auto & bluredPixels = bluredBitmap.Pixels();
+		totalBluredPixels.insert(totalBluredPixels.end(), std::make_move_iterator(bluredPixels.cbegin()), std::make_move_iterator(bluredPixels.cend()));
+	}
+	return { std::move(totalBluredPixels), width, height };
+}
+
+void Blur(std::string_view imgInName, std::string_view imgOutName, size_t threadsCount, size_t coresCount)
+{
+	auto [pixels, width, height] = ImportPixels(imgInName);
+	Bitmap bmp(pixels, width, height);
+
+	auto subBitmaps = BunchifyBitmap(bmp, threadsCount);
+	std::vector<std::thread> threads;
+	for (size_t i = 0; i < subBitmaps.size(); ++i)
+	{
+		threads.emplace_back([&subBitmaps, i]() {
+			subBitmaps[i] = BlurBitmap(subBitmaps[i]);
+		});
+		SetThreadAffinityMask(threads.back(), coresCount);
+	}
+	for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
+
+	const auto bluredBitmap = MergeBitmaps(std::move(subBitmaps), bmp.Width(), bmp.Height());
+	ExportPixels(bluredBitmap.Pixels(), bmp.Width(), bmp.Height(), imgOutName.data());
+}
+
+}
 
 int main(int argc, char * argv[])
 {

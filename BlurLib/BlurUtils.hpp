@@ -12,9 +12,6 @@
 #include "BitmapUtils.hpp"
 #include "ThreadUtils.h"
 
-namespace
-{
-
 Bitmap BlurBitmap(const Bitmap & bmp)
 {
 	std::vector<Pixel> pixels;
@@ -81,32 +78,4 @@ std::vector<Bitmap> BunchifyBitmap(const Bitmap & bmp, size_t bunchSize)
 		bunches.emplace_back(bunch, bmp.Width(), bunch.size() / bmp.Width());
 	}
 	return bunches;
-}
-
-}
-
-void Blur(std::string_view imgInName, std::string_view imgOutName, size_t threadsCount, size_t coresCount)
-{
-	auto [pixels, width, height] = ImportPixels(imgInName);
-	Bitmap bmp(pixels, width, height);
-
-	auto subBitmaps = BunchifyBitmap(bmp, threadsCount);
-	std::vector<std::thread> threads;
-	for (size_t i = 0; i < subBitmaps.size(); ++i)
-	{
-		threads.emplace_back([&subBitmaps, i]() {
-			subBitmaps[i] = BlurBitmap(subBitmaps[i]);
-		});
-		SetThreadAffinityMask(threads.back(), coresCount);
-	}
-	for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
-
-	std::vector<Pixel> totalBluredPixels;
-	totalBluredPixels.reserve(bmp.Width() * bmp.Height());
-	for (const auto & bluredBitmap : subBitmaps)
-	{
-		const auto & bluredPixels = bluredBitmap.Pixels();
-		totalBluredPixels.insert(totalBluredPixels.end(), std::make_move_iterator(bluredPixels.cbegin()), std::make_move_iterator(bluredPixels.cend()));
-	}
-	ExportPixels(totalBluredPixels, bmp.Width(), bmp.Height(), imgOutName.data());
 }
