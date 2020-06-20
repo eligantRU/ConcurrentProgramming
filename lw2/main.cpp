@@ -5,18 +5,6 @@
 namespace
 {
 
-Bitmap MergeBitmaps(std::vector<Bitmap> && bitmaps, size_t width, size_t height)
-{
-	std::vector<Pixel> totalBluredPixels;
-	totalBluredPixels.reserve(width * height);
-	for (const auto & bluredBitmap : bitmaps)
-	{
-		const auto & bluredPixels = bluredBitmap.Pixels();
-		totalBluredPixels.insert(totalBluredPixels.end(), std::make_move_iterator(bluredPixels.cbegin()), std::make_move_iterator(bluredPixels.cend()));
-	}
-	return { std::move(totalBluredPixels), width, height };
-}
-
 void Blur(std::string_view imgInName, std::string_view imgOutName, size_t threadsCount, size_t coresCount)
 {
 	auto [pixels, width, height] = ImportPixels(imgInName);

@@ -12,6 +12,34 @@
 #include "BitmapUtils.hpp"
 #include "ThreadUtils.h"
 
+namespace
+{
+
+template<class T>
+std::vector<std::vector<T>> Bunchify(const std::vector<T> & container, size_t bunchSize)
+{
+	std::vector<std::vector<T>> bunches;
+	for(size_t i = 0; i < container.size(); i += bunchSize)
+	{
+		bunches.emplace_back(container.cbegin() + i, container.cbegin() + std::min(container.size(), i + bunchSize));
+	}
+	return bunches;
+}
+
+}
+
+Bitmap MergeBitmaps(std::vector<Bitmap> && bitmaps, size_t width, size_t height)
+{
+	std::vector<Pixel> totalBluredPixels;
+	totalBluredPixels.reserve(width * height);
+	for (const auto & bluredBitmap : bitmaps)
+	{
+		const auto & bluredPixels = bluredBitmap.Pixels();
+		totalBluredPixels.insert(totalBluredPixels.end(), std::make_move_iterator(bluredPixels.cbegin()), std::make_move_iterator(bluredPixels.cend()));
+	}
+	return { std::move(totalBluredPixels), width, height };
+}
+
 Bitmap BlurBitmap(const Bitmap & bmp)
 {
 	std::vector<Pixel> pixels;
@@ -54,17 +82,6 @@ Bitmap BlurBitmap(const Bitmap & bmp)
 		}
 	}
 	return {pixels, bmp.Width(), bmp.Height()};
-}
-
-template<class T>
-std::vector<std::vector<T>> Bunchify(const std::vector<T> & container, size_t bunchSize)
-{
-	std::vector<std::vector<T>> bunches;
-	for(size_t i = 0; i < container.size(); i += bunchSize)
-	{
-		bunches.emplace_back(container.cbegin() + i, container.cbegin() + std::min(container.size(), i + bunchSize));
-	}
-	return bunches;
 }
 
 std::vector<Bitmap> BunchifyBitmap(const Bitmap & bmp, size_t bunchSize)
