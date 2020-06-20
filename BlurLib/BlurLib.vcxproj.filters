@@ -30,10 +30,10 @@
     <ClInclude Include="Pixel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThreadUtils.h">
+    <ClInclude Include="TimeUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TimeUtils.hpp">
+    <ClInclude Include="ThreadUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

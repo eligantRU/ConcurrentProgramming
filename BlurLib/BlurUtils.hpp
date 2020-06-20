@@ -10,7 +10,7 @@
 #include <array>
 
 #include "BitmapUtils.hpp"
-#include "ThreadUtils.h"
+#include "ThreadUtils.hpp"
 
 namespace
 {
