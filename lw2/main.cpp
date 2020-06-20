@@ -5,6 +5,51 @@
 namespace
 {
 
+Bitmap BlurBitmap(const Bitmap & bmp)
+{
+	std::vector<Pixel> pixels;
+	pixels.reserve(bmp.Width() * bmp.Height());
+
+	const auto getPixel = [](const Bitmap & bmp, size_t x, size_t y) -> std::optional<Pixel> {
+		if ((x >= bmp.Width()) || (y >= bmp.Height()))
+		{
+			return std::nullopt;
+		}
+		return bmp.Pixel(x, y);
+	};
+
+	for (size_t y = 0; y < bmp.Height(); ++y)
+	{
+		for (size_t x = 0; x < bmp.Width(); ++x)
+		{
+			constexpr size_t matrixOrder = 9;
+
+			std::array<std::optional<Pixel>, matrixOrder> optPixels = {
+				getPixel(bmp, x - 1, y - 1), getPixel(bmp, x, y - 1), getPixel(bmp, x + 1, y - 1),
+				getPixel(bmp, x - 1, y), getPixel(bmp, x, y), getPixel(bmp, x + 1, y),
+				getPixel(bmp, x - 1, y + 1), getPixel(bmp, x, y + 1), getPixel(bmp, x + 1, y + 1),
+			};
+			const auto nulloptCount = count(optPixels.cbegin(), optPixels.cend(), std::nullopt);
+			const auto r = accumulate(optPixels.cbegin(), optPixels.cend(), static_cast<size_t>(0), [](size_t acc, const auto & pixel) {
+				return acc + (pixel ? (*pixel).R : 0);
+			});
+			const auto g = accumulate(optPixels.cbegin(), optPixels.cend(), static_cast<size_t>(0), [](size_t acc, const auto & pixel) {
+				return acc + (pixel ? (*pixel).G : 0);
+			});
+			const auto b = accumulate(optPixels.cbegin(), optPixels.cend(), static_cast<size_t>(0), [](size_t acc, const auto & pixel) {
+				return acc + (pixel ? (*pixel).B : 0);
+			});
+			pixels.push_back({
+				static_cast<uint8_t>(r / (matrixOrder - nulloptCount)),
+				static_cast<uint8_t>(g / (matrixOrder - nulloptCount)),
+				static_cast<uint8_t>(b / (matrixOrder - nulloptCount))
+			});
+		}
+	}
+	return {pixels, bmp.Width(), bmp.Height()};
+}
+
+
 void Blur(std::string_view imgInName, std::string_view imgOutName, size_t threadsCount, size_t coresCount)
 {
 	auto [pixels, width, height] = ImportPixels(imgInName);
