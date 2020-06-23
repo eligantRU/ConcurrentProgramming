@@ -10,16 +10,17 @@ namespace
 
 void ThrowInvalidCommandLineArguments() // TODO: custom exception class with what overriding
 {
-	throw std::exception((std::string("Invalid command line arguments. Should be:\n")
-		+ std::string("EXE <input_file_name> <output_file_name> <threads_count> <cores_count> <thread_priorities>\n")
-		+ std::string("Thread priorities:\n")
-		+ std::string("	0 - ABOVE_NORMAL\n")
-		+ std::string("	1 - BELOW_NORMAL\n")
-		+ std::string("	2 - HIGHEST\n")
-		+ std::string("	3 - IDLE\n")
-		+ std::string("	4 - LOWEST\n")
-		+ std::string("	5 - NORMAL\n")
-		+ std::string("	6 - TIME_CRTICIAL\n")).c_str());
+	using namespace std::string_literals;
+	throw std::exception(("Invalid command line arguments. Should be:\n"s
+		+ "EXE <input_file_name> <output_file_name> <threads_count> <cores_count> <thread_priorities>\n"
+		+ "Thread priorities:\n"
+		+ "	0 - ABOVE_NORMAL\n"
+		+ "	1 - BELOW_NORMAL\n"
+		+ "	2 - HIGHEST\n"
+		+ "	3 - IDLE\n"
+		+ "	4 - LOWEST\n"
+		+ "	5 - NORMAL\n"
+		+ "	6 - TIME_CRTICIAL\n").c_str());
 }
 
 Bitmap BlurBitmap(const Bitmap & bmp, std::ostream & log, clock_t beginTime, size_t threadNum)
