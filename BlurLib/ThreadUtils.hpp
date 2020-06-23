@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma once
+
 #include <thread>
 
 enum class ThreadPriority : size_t

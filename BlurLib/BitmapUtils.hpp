@@ -1,3 +1,5 @@
+#pragma once
+
 #pragma warning(disable : 4714)
 #pragma warning(disable : 4244)
 
