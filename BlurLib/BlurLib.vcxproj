@@ -143,6 +143,7 @@
     <ClInclude Include="BlurUtils.hpp" />
     <ClInclude Include="CommandLineUtils.hpp" />
     <ClInclude Include="Pixel.hpp" />
+    <ClInclude Include="ProcessingMode.hpp" />
     <ClInclude Include="ThreadUtils.hpp" />
     <ClInclude Include="TimeUtils.hpp" />
   </ItemGroup>

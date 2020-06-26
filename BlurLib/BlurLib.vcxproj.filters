@@ -36,6 +36,9 @@
     <ClInclude Include="ThreadUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProcessingMode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThreadUtils.cpp">

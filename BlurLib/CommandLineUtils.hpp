@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 
+#include "ProcessingMode.hpp"
 #include "ThreadUtils.hpp"
 
 bool IsNumber(const std::string_view & str)
@@ -32,17 +33,30 @@ size_t ExtractPositiveInteger(std::string_view arg)
 	}
 }
 
-std::vector<ThreadPriority> ExtractThreadPriorities(size_t threadsCount, size_t argc, char * argv[])
+std::vector<ThreadPriority> ExtractThreadPriorities(size_t threadsCount, size_t argc, char * argv[], int shift = 0)
 {
-	if (argc != (threadsCount + 5))
+	if (argc != (threadsCount + 5 + shift))
 	{
 		throw std::exception();
 	}
 	std::vector<ThreadPriority> threadPriorities;
 	threadPriorities.reserve(threadsCount);
-	for (size_t i = 5; i < argc; ++i)
+	for (size_t i = 5 + shift; i < argc; ++i)
 	{
 		threadPriorities.push_back(ToThreadPriority(std::stoi(argv[i])));
 	}
 	return threadPriorities;
+}
+
+ProcessingMode ExtractProcessingMode(std::string_view str)
+{
+	if (str == "tp")
+	{
+		return ProcessingMode::ThreadPool;
+	}
+	else if (str == "ntp")
+	{
+		return ProcessingMode::NonThreadPool;
+	}
+	throw std::exception((std::string("Unknown processing mode: ") + str.data()).c_str());
 }
